@@ -1,0 +1,110 @@
+IButtonActions.cs
+
+namespace MyPatientApp
+{
+    public interface IButtonActions
+    {
+        event EventHandler AddPatient;
+        event EventHandler EditPatient;
+        event EventHandler DeletePatient;
+    }
+}
+
+2. PatientViewModel.cs
+
+using System;
+
+namespace MyPatientApp
+{
+    public class PatientViewModel : IButtonActions
+    {
+        public event EventHandler AddPatient;
+        public event EventHandler EditPatient;
+        public event EventHandler DeletePatient;
+
+        protected virtual void OnAddPatient() => AddPatient?.Invoke(this, EventArgs.Empty);
+        protected virtual void OnEditPatient() => EditPatient?.Invoke(this, EventArgs.Empty);
+        protected virtual void OnDeletePatient() => DeletePatient?.Invoke(this, EventArgs.Empty);
+
+        public void AddButtonClicked() => OnAddPatient();
+        public void EditButtonClicked() => OnEditPatient();
+        public void DeleteButtonClicked() => OnDeletePatient();
+    }
+}
+
+3. MainWindow.xaml
+
+<Window x:Class="MyPatientApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Patient Admission" Height="350" Width="525">
+    <StackPanel>
+        <Button Content="Add Patient" Name="btnAdd"/>
+        <Button Content="Edit Patient" Name="btnEdit"/>
+        <Button Content="Delete Patient" Name="btnDelete"/>
+    </StackPanel>
+</Window>
+
+4. MainWindow.xaml.cs
+
+using System.Windows;
+
+namespace MyPatientApp
+{
+    public partial class MainWindow : Window
+    {
+        private PatientViewModel viewModel;
+
+        public MainWindow()
+        {
+            InitializeComponent();
+            viewModel = new PatientViewModel();
+
+            // Subscribe to events
+            viewModel.AddPatient += ViewModel_AddPatient;
+            viewModel.EditPatient += ViewModel_EditPatient;
+            viewModel.DeletePatient += ViewModel_DeletePatient;
+
+            // Assign button click event handlers
+            btnAdd.Click += (s, e) => viewModel.AddButtonClicked();
+            btnEdit.Click += (s, e) => viewModel.EditButtonClicked();
+            btnDelete.Click += (s, e) => viewModel.DeleteButtonClicked();
+        }
+
+        private void ViewModel_AddPatient(object sender, EventArgs e)
+        {
+            MessageBox.Show("Add Patient clicked");
+        }
+
+        private void ViewModel_EditPatient(object sender, EventArgs e)
+        {
+            MessageBox.Show("Edit Patient clicked");
+        }
+
+        private void ViewModel_DeletePatient(object sender, EventArgs e)
+        {
+            MessageBox.Show("Delete Patient clicked");
+        }
+    }
+}
+
+5. App.xaml
+
+<Application x:Class="MyPatientApp.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+    </Application.Resources>
+</Application>
+
+6. App.xaml.cs
+
+using System.Windows;
+
+namespace MyPatientApp
+{
+    public partial class App : Application
+    {
+    }
+}
